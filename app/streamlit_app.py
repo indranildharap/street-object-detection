@@ -4,8 +4,21 @@ import os
 
 import requests
 import streamlit as st
+from streamlit.errors import StreamlitSecretNotFoundError
 
-API_URL = os.getenv("STREET_OBJECT_API_URL", "http://127.0.0.1:8000/detect")
+
+def get_api_url() -> str:
+    api_url = os.getenv("STREET_OBJECT_API_URL")
+    if api_url:
+        return api_url
+
+    try:
+        return st.secrets["STREET_OBJECT_API_URL"]
+    except (KeyError, StreamlitSecretNotFoundError):
+        return "http://127.0.0.1:8000/detect"
+
+
+API_URL = get_api_url()
 UPLOAD_KEY_PREFIX = "street_object_upload"
 
 st.set_page_config(page_title="Street Object Detector", layout="wide")
